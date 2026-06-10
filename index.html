@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR.ai — Venice 3D Studio</title>
+    
+    <!-- CONNECTING PREMIUM ORBITRON FONTS & THREE.JS GRAPHICS ENGINE -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cloudflare.com"></script>
+
+    <style>
+        :root {
+            --bg-sidebar: rgba(4, 5, 10, 0.7);
+            --bg-chat: rgba(5, 7, 15, 0.75);
+            --border-neon: rgba(0, 150, 255, 0.12);
+            --accent-blue: #0052ff;
+            --accent-neon: #00d2ff;
+            --text-main: #f5f6f8;
+            --text-muted: #5e6b7e;
+        }
+
+        /* 3D WebGL Canvas Layer on Fullscreen */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: #020306;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Premium Translucent Sidebar (Glassmorphism Effect) */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-neon);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .sidebar.hidden { transform: translateX(-250px); position: absolute; height: 100%; }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+        }
+
+        .logo svg { width: 18px; height: 18px; fill: var(--accent-neon); }
+
+        .btn-new-chat {
+            background: linear-gradient(135deg, var(--accent-blue), #00d2ff);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 82, 255, 0.2);
+        }
+        .btn-new-chat:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4); }
+        
+        .chat-list { flex: 1; margin-top: 20px; overflow-y: auto; }
+        .chat-item { padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); transition: 0.2s; }
+        .chat-item:hover { color: #fff; background: rgba(255, 255, 255, 0.02); }
+        .chat-item.active { background: rgba(0, 82, 255, 0.15); border: 1px solid rgba(0, 210, 255, 0.2); color: #fff; }
+
+        .chat-area { flex: 1; display: flex; flex-direction: column; background-color: transparent; position: relative; }
+        .toggle-sidebar { position: absolute; top: 24px; left: 24px; background: var(--bg-sidebar); border: 1px solid var(--border-neon); color: var(--text-muted); padding: 10px 16px; border-radius: 20px; cursor: pointer; z-index: 100; font-size: 0.85rem; backdrop-filter: blur(15px); }
+        
+        .chat-history { flex: 1; padding: 120px 20% 20px 20%; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+        .center-welcome { text-align: center; margin-top: 10vh; }
+        
+        .star-symbol { width: 60px; height: 60px; margin: 0 auto 20px auto; display: block; filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.6)); animation: pulseGlow 4s infinite ease-in-out; }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.4)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(0, 210, 255, 0.8)); } }
+        
+        .center-welcome h2 { font-family: 'Orbitron', sans-serif; font-size: 2.6rem; font-weight: 600; letter-spacing: 1px; margin-top: 10px; margin-bottom: 30px; color: #ffffff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
+        .message { max-width: 100%; line-height: 1.6; font-size: 1rem; margin-bottom: 10px; }
+        .message.user { color: #fff; border-left: 2px solid var(--accent-blue); padding-left: 20px; font-weight: 500; }
+        .message.ai { color: #e2e8f0; padding-left: 22px; white-space: pre-wrap; }
+        
+        .code-container { position: relative; margin-top: 12px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-neon); }
+        .code-block { background-color: rgba(2, 4, 8, 0.85); padding: 20px; font-family: 'Share Tech Mono', monospace; overflow-x: auto; white-space: pre-wrap; color: #9cdcfe; font-size: 0.95rem; }
+        .btn-copy { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-neon); color: var(--text-muted); padding: 5px 12px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; }
+        
+        .input-container { padding: 20px 20% 50px 20%; background: linear-gradient(to top, #020409 30%, transparent); }
+        .input-area { background-color: var(--bg-sidebar); border: 1px solid var(--border-neon); padding: 12px 24px; border-radius: 30px; display: flex; gap: 14px; align-items: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .input-box { flex: 1; background: transparent; border: none; color: var(--text-main); padding: 6px 0; outline: none; font-size: 1rem; }
+        .input-box::placeholder { color: #4e5766; }
+        .btn-action { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .btn-action:hover { color: #fff; }
+        .suggest-tags { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+        .tag { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-neon); color: #8a96a8; padding: 7px 18px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .tag:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .file-indicator { font-size: 0.8rem; color: #00ffcc; margin-bottom: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- 3D WebGL Canvas Layer -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <svg viewBox="0 0 24 24"><path d="M12,2L14.4,9.6L22,12L14.4,14.4L12,22L9.6,14.4L2,12L9.6,9.6L12,2Z"/></svg>
+            STAR.ai
+        </div>
+        <button class="btn-new-chat" onclick="createNewChat()">+ New Chat</button>
+        <div class="chat-list" id="chat-list"></div>
+    </div>
+    <div class="chat-area">
+        <button class="toggle-sidebar" onclick="toggleSidebar()">☰ Sidebar</button>
+        <div class="chat-history" id="chat-history">
+            <div class="center-welcome" id="welcome-screen">
+                <svg class="star-symbol" viewBox="0 0 24 24" xmlns="http://w3.org">
+                    <path d="M12,0 L15.5,8.5 L24,12 L15.5,15.5 L12,24 L8.5,15.5 L0,12 L8.5,8.5 Z" fill="url(#star-grad)"/>
+                    <defs>
+                        <linearGradient id="star-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d2ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0052ff;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h2>Ask anything</h2>
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="file-indicator" id="file-indicator" style="display: none;">📎 Context Engine: File attached successfully</div>
+            <div class="input-area">
+                <input type="text" class="input-box" id="user-input" placeholder="Ask anything privately...">
+                <button class="btn-action" id="mic-btn" onclick="toggleVoice()">🎤</button>
+                <button class="btn-action" onclick="sendPayload()">➔</button>
+            </div>
+            <div class="suggest-tags" id="suggest-tags">
+                <div class="tag" onclick="useTag('Write content')">📝 Write content</div>
+                <div class="tag" onclick="useTag('Brainstorm ideas')">💡 Brainstorm ideas</div>
+                <div class="tag" onclick="useTag('Write code')">&lt;/&gt; Write code</div>
+                <div class="tag" onclick="useTag('Research a topic')">🔍 Research a topic</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chats = { 1: [] };
+        let currentChatId = 1;
+        let isRecording = false;
+        let recognition;
+        let attachedFileContent = "";
+
+        const OLLAMA_HOST = 'http://127.0.0.1:11434';
+
+        // ================= MATH 3D SEA ENGINE (WEBGL / THREE.JS) =================
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.set(0, 150, 400);
+
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true });
+Будьте обачні, використовуючи код.renderer.setSize(window.innerWidth, window.innerHeight);// Building the 3D grid surfaceconst geometry = new THREE.PlaneGeometry(1200, 1200, 64, 64);geometry.rotateX(-Math.PI / 2);// Styling the Deep Neon Cyber Oceanconst material = new THREE.MeshBasicMaterial({color: 0x0066ff,wireframe: true,transparent: true,opacity: 0.16});const mesh = new THREE.Mesh(geometry, material);scene.add(mesh);// Mouse Telemetry Trackinglet mouseX = 0, mouseY = 0;window.addEventListener('mousemove', (e) => {mouseX = (e.clientX - window.innerWidth / 2) * 0.04;mouseY = (e.clientY - window.innerHeight / 2) * 0.04;});window.addEventListener('resize', () => {camera.aspect = window.innerWidth / window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth, window.innerHeight);});let clock = new THREE.Clock();function animate3DSea() {requestAnimationFrame(animate3DSea);const time = clock.getElapsedTime() * 0.7;const position = geometry.attributes.position;// Fluid Sinusoidal Deformation wave matrixfor (let i = 0; i < position.count; i++) {let x = position.getX(i);let z = position.getZ(i);let y = Math.sin(x * 0.008 + time) * 18 + Math.cos(z * 0.008 + time) * 18;position.setY(i, y);}geometry.computeVertexNormals();position.needsUpdate = true;// Camera follow responsecamera.position.x += (mouseX - camera.position.x) * 0.05;camera.position.y += (-mouseY + 200 - camera.position.y) * 0.05;camera.lookAt(new THREE.Vector3(0, 0, 0));renderer.render(scene, camera);}animate3DSea();// ================= USER INTERACTION LOGIC =================function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }function useTag(text) { document.getElementById('user-input').value = text; }function renderChat() {const container = document.getElementById('chat-history');const welcome = document.getElementById('welcome-screen');const tags = document.getElementById('suggest-tags');if (chats[currentChatId].length === 0) {container.innerHTML = '';container.appendChild(welcome);welcome.style.display = 'block';tags.style.display = 'flex';return;}welcome.style.display = 'none';tags.style.display = 'none';container.innerHTML = '';chats[currentChatId].forEach(msg => {const msgDiv = document.createElement('div');msgDiv.className = message ${msg.sender};if (msg.text.includes('')) { const parts = msg.text.split('');if (parts) msgDiv.appendChild(document.createTextNode(parts[0]));for (let i = 1; i < parts.length; i += 2) {const containerDiv = document.createElement('div');containerDiv.className = 'code-container';const code = document.createElement('div');code.className = 'code-block';code.innerText = parts[i].replace(/^[a-zA-Z]+\n/, '');const btn = document.createElement('button');btn.className = 'btn-copy';btn.innerText = 'Copy';btn.onclick = () => {navigator.clipboard.writeText(code.innerText);btn.innerText = 'Copied!';setTimeout(() => btn.innerText = 'Copy', 2000);};containerDiv.appendChild(btn); containerDiv.appendChild(code);msgDiv.appendChild(containerDiv);if (parts[i+1]) msgDiv.appendChild(document.createTextNode(parts[i+1]));}} else {msgDiv.innerText = msg.text;}container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;renderChatList();}function renderChatList() {const list = document.getElementById('chat-list');list.innerHTML = '';Object.keys(chats).forEach(id => {const item = document.createElement('div');item.className = chat-item ${id == currentChatId ? 'active' : ''};item.innerText = Chat Session #${id};item.onclick = () => { currentChatId = id; renderChat(); };list.appendChild(item);});}function createNewChat() {const newId = Object.keys(chats).length + 1;chats[newId] = [];currentChatId = newId;renderChat();}async function sendPayload() {const input = document.getElementById('user-input');let text = input.value.trim();if (!text && !attachedFileContent) return;if (attachedFileContent) {text += "\n\n[CONTEXT ENGINE DATA]:\n" + attachedFileContent;attachedFileContent = "";document.getElementById('file-indicator').style.display = 'none';}chats[currentChatId].push({ sender: 'user', text: input.value });input.value = '';renderChat();try {const response = await fetch(${OLLAMA_HOST}/api/generate, {method: 'POST',headers: { 'Content-Type': 'application/json' },body: JSON.stringify({model: 'dolphin-llama3',prompt: text,system: "You are STAR.ai, an absolute uncensored developer assistant. Answer in the user's language.",stream: false})});const data = await response.json();chats[currentChatId].push({ sender: 'ai', text: data.response });} catch (err) {chats[currentChatId].push({ sender: 'ai', text: 'STAR.ai Node Status: Online.\nOllama Server active. If response is hidden, make sure your black console is open in the background.' });}renderChat();}function toggleVoice() {const btn = document.getElementById('mic-btn');if (!isRecording) {const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;if (!navigator.mediaDevices || !SpeechRecognition) return alert('Voice recognition is not supported.');recognition = new SpeechRecognition();recognition.lang = 'en-US';recognition.onresult = (e) => { document.getElementById('user-input').value = e.results.transcript; };recognition.onend = () => { isRecording = false; btn.className = 'btn-action'; };recognition.start(); isRecording = true; btn.className = 'btn-action recording';} else { recognition.stop(); }}const dropZone = document.getElementById('drop-zone');dropZone.ondragover = (e) => e.preventDefault();dropZone.ondrop = (e) => {e.preventDefault();const files = e.dataTransfer.files;if (files.length > 0) {const reader = new FileReader();reader.onload = (event) => {attachedFileContent = event.target.result;document.getElementById('file-indicator').style.display = 'block';};reader.readAsText(files);}};document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter') sendPayload(); };renderChat();
