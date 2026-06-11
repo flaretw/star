@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VELOCITY — Ultimate Omni AI</title>
+    <title>VELOCITY — 3D Cyber Ocean</title>
     
-    <!-- ПОДКЛЮЧАЕМ ТОПОВЫЕ ДИЗАЙНЕРСКИЕ ШРИФТЫ -->
+    <!-- ПОДКЛЮЧАЕМ ШРИФТЫ И ГРАФИЧЕСКИЙ РУШИЙ THREE.JS ДЛЯ 3D ВОЛН -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Dela+Gothic+One&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cloudflare.com"></script>
 
     <style>
         :root {
-            --bg-main: rgba(4, 3, 2, 0.4);
-            --bg-sidebar: rgba(12, 8, 6, 0.85);
-            --bg-chat-card: rgba(18, 11, 7, 0.35);
+            --bg-main: transparent;
+            --bg-sidebar: rgba(10, 6, 4, 0.6);
             --border-neon: rgba(255, 85, 0, 0.15);
             --border-neon-active: rgba(255, 115, 0, 0.45);
             --accent-orange: #ff4500;
@@ -24,162 +24,53 @@
             --sidebar-width: 270px;
         }
 
-        /* 100% БЕЗВІДМОВНЕ ПОМАРАНЧЕВЕ МОРЕ НА ЧИСТОМУ CSS */
-        .sea-background {
+        /* ПОЛОТНО ДЛЯ ГАРАНТОВАНОГО ЗАПУСКУ 3D МОРЯ */
+        #webgl-canvas {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            /* Створюємо глибокі магматичні переливи хвиль */
-            background: linear-gradient(135deg, #030201 0%, #170902 35%, #301402 70%, #030201 100%);
-            background-size: 400% 400%;
-            /* Запускаємо плавну анімацію припливу плазми */
-            animation: liquidOcean 12s ease-in-out infinite;
+            background: #020102;
         }
 
-        @keyframes liquidOcean {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Додатковий шар для створення ефекту глибини та мерехтіння води */
-        .sea-glow {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background: radial-gradient(circle at 50% 60%, rgba(255, 115, 0, 0.08) 0%, transparent 65%);
-            animation: pulseWater 6s ease-in-out infinite;
-        }
-
-        @keyframes pulseWater {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 0.9; transform: scale(1.04); }
-        }
-
-        body { background-color: transparent; color: var(--text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: #020102; color: var(--text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* PREMIUM SIDEBAR */
         .sidebar { 
-            width: var(--sidebar-width); 
-            background-color: var(--bg-sidebar); 
-            border-right: 1px solid var(--border-neon); 
-            display: flex; 
-            flex-direction: column; 
-            padding: 35px 24px; 
-            box-sizing: border-box; 
-            backdrop-filter: blur(40px); 
-            -webkit-backdrop-filter: blur(40px); 
+            width: var(--sidebar-width); background-color: var(--bg-sidebar); border-right: 1px solid var(--border-neon); 
+            display: flex; flex-direction: column; padding: 35px 24px; box-sizing: border-box; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
         }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .logo { 
-            font-family: 'Dela Gothic One', cursive; 
-            font-size: 1.2rem; 
-            letter-spacing: 3px; 
-            text-transform: uppercase; 
-            color: #ffffff; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            text-shadow: 0 0 20px rgba(255, 69, 0, 0.65); 
-        }
-        .logo svg { width: 24px; height: 24px; fill: url(#orange-grad); filter: drop-shadow(0 0 6px var(--accent-orange)); }
-
-        .btn-reset {
-            background: transparent; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; transition: all 0.3s ease;
-        }
+        .logo-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+        .logo { font-family: 'Dela Gothic One', cursive; font-size: 1.2rem; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; display: flex; align-items: center; gap: 12px; text-shadow: 0 0 20px rgba(255, 69, 0, 0.65); }
+        .logo svg { width: 24px; height: 24px; fill: #ff4500; }
+        
+        .btn-reset { background: transparent; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; transition: all 0.3s ease; }
         .btn-reset:hover { color: var(--accent-orange); transform: rotate(-90deg); }
         .btn-reset svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
         .btn-new-chat { 
-            background: rgba(255, 69, 0, 0.02);
-            color: #ffffff; 
-            border: 1px solid var(--border-neon);
-            padding: 14px 20px; 
-            border-radius: 28px; 
-            font-weight: 500; 
-            font-size: 0.88rem;
-            cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            letter-spacing: 0.5px;
+            background: rgba(255, 69, 0, 0.02); color: #ffffff; border: 1px solid var(--border-neon); padding: 14px 20px; border-radius: 28px; font-weight: 500; font-size: 0.88rem; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); display: flex; align-items: center; justify-content: space-between;
         }
-        .btn-new-chat:hover { 
-            background: rgba(255, 69, 0, 0.06);
-            border-color: var(--border-neon-active);
-            box-shadow: 0 0 25px rgba(255, 69, 0, 0.15);
-            transform: translateY(-1px);
-        }
+        .btn-new-chat:hover { background: rgba(255, 69, 0, 0.06); border-color: var(--border-neon-active); box-shadow: 0 0 25px rgba(255, 69, 0, 0.15); }
         .btn-new-chat svg { width: 14px; height: 14px; fill: none; stroke: var(--accent-neon); stroke-width: 2.5; }
         
         .chat-list { flex: 1; margin-top: 35px; overflow-y: auto; }
-        .chat-list::-webkit-scrollbar { width: 0px; }
-        
-        .chat-item { 
-            padding: 14px 18px; 
-            border-radius: 16px; 
-            margin-bottom: 8px; 
-            cursor: pointer; 
-            font-size: 0.86rem; 
-            color: var(--text-muted); 
-            transition: all 0.3s ease;
-            position: relative;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid transparent;
-        }
+        .chat-item { padding: 14px 18px; border-radius: 16px; margin-bottom: 8px; cursor: pointer; font-size: 0.86rem; color: var(--text-muted); transition: all 0.3s ease; position: relative; background: rgba(255, 255, 255, 0.01); }
         .chat-item:hover { color: #ffffff; background: rgba(255, 255, 255, 0.03); }
-        .chat-item.active { 
-            background: rgba(255, 69, 0, 0.05); 
-            border-color: rgba(255, 69, 0, 0.15);
-            color: #ffffff; 
-            font-weight: 500;
-        }
-        .chat-item.active::before {
-            content: ''; position: absolute; left: 0; top: 30%; width: 3px; height: 40%;
-            background: var(--accent-orange); border-radius: 4px; box-shadow: 0 0 10px var(--accent-orange);
-        }
+        .chat-item.active { background: rgba(255, 69, 0, 0.05); border-color: rgba(255, 69, 0, 0.15); color: #ffffff; font-weight: 500; }
+        .chat-item.active::before { content: ''; position: absolute; left: 0; top: 30%; width: 3px; height: 40%; background: var(--accent-orange); border-radius: 4px; box-shadow: 0 0 10px var(--accent-orange); }
         
         .chat-area { flex: 1; display: flex; flex-direction: column; background-color: transparent; position: relative; }
         .chat-history { flex: 1; padding: 130px 24px 20px 24px; max-width: 900px; width: 100%; margin: 0 auto; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 32px; }
         .chat-history::-webkit-scrollbar { width: 0px; }
         
         .center-welcome { text-align: center; margin-top: 12vh; }
-        
-        .star-symbol { 
-            width: 70px; height: 70px; margin: 0 auto 28px auto; display: block; 
-            filter: drop-shadow(0 0 12px rgba(255, 69, 0, 0.4)); 
-            animation: luxuryPulse 5s ease-in-out infinite; 
-        }
-        @keyframes luxuryPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 12px rgba(255, 69, 0, 0.4)); }
-            50% { transform: scale(1.05) rotate(15deg); filter: drop-shadow(0 0 25px rgba(255, 153, 0, 0.6)); }
-        }
+        .star-symbol { width: 65px; height: 65px; margin: 0 auto 24px auto; display: block; filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.4)); }
         
         .center-welcome h2 { 
             font-family: 'Orbitron', sans-serif; font-size: 2.8rem; font-weight: 600; margin-bottom: 45px; color: #ffffff; letter-spacing: -0.5px;
-            background: linear-gradient(180deg, #ffffff 50%, rgba(255,255,255,0.3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background: linear-gradient(180deg, #ffffff 50%, rgba(255,255,255,0.3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .message { 
-            max-width: 85%; 
-            line-height: 1.7; 
-            font-size: 1rem; 
-            font-family: 'Inter', sans-serif; 
-            padding: 6px 0; 
-            animation: messageFadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        @keyframes messageFadeIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .message { max-width: 85%; line-height: 1.7; font-size: 1rem; font-family: 'Inter', sans-serif; padding: 6px 0; animation: messageFadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes messageFadeIn { to { opacity: 1; transform: translateY(0); } }
         
         .message.user { color: #ffffff; border-left: 2px solid var(--accent-orange); padding-left: 24px; font-weight: 500; align-self: flex-start; }
         .message.ai { color: #e5d7d0; padding-left: 26px; white-space: pre-wrap; align-self: flex-start; }
@@ -187,28 +78,51 @@
         .code-container { position: relative; margin-top: 16px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-neon); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .code-block { background-color: rgba(6, 4, 3, 0.95); padding: 24px; font-family: 'Share Tech Mono', monospace; overflow-x: auto; white-space: pre-wrap; color: #ffca85; font-size: 0.96rem; letter-spacing: 0.5px; }
         .btn-copy { position: absolute; top: 12px; right: 12px; background: rgba(15,10,7,0.6); border: 1px solid var(--border-neon); color: var(--text-muted); padding: 6px 14px; font-size: 0.75rem; border-radius: 8px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
-        .btn-copy:hover { color: #ffffff; border-color: rgba(255,115,0,0.4); }
 
         .input-container { padding: 20px 24px 45px 24px; max-width: 900px; width: 100%; margin: 0 auto; box-sizing: border-box; background: linear-gradient(to top, #020101 60%, transparent); position: relative; }
-        
-        /* LUXURY INPUT BOX HUB */
-        .input-area { 
-            background-color: rgba(15, 10, 7, 0.85); 
-            border: 1px solid var(--border-neon); 
-            padding: 14px 28px; 
-            border-radius: 32px; 
-            display: flex; 
-            gap: 18px; 
-            align-items: center; 
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .input-area:focus-within {
-            border-color: var(--border-neon-active);
-            box-shadow: 0 15px 50px rgba(255, 69, 0, 0.2), 0 0 30px rgba(255, 69, 0, 0.05);
-        }
+        .input-area { background-color: rgba(15, 10, 7, 0.75); border: 1px solid var(--border-neon); padding: 14px 28px; border-radius: 32px; display: flex; gap: 18px; align-items: center; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+        .input-area:focus-within { border-color: var(--border-neon-active); box-shadow: 0 15px 50px rgba(255, 69, 0, 0.15), 0 0 30px rgba(255, 69, 0, 0.05); }
         .input-box { flex: 1; background: transparent; border: none; color: #ffffff; padding: 6px 0; outline: none; font-size: 1.02rem; font-family: 'Inter', sans-serif; }
         .input-box::placeholder { color: #524741; }
         
-Будьте обачні, використовуючи код..btn-action { background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; padding: 4px; }.btn-action svg { width: 18px; height: 18px; fill: none; stroke: var(--text-muted); stroke-width: 2.5; transition: all 0.3s ease; }.btn-action:hover svg { stroke: var(--accent-neon); transform: translateX(3px); }/* NEON PULSING PROGRESS LOADER */.glow-loader {position: absolute;bottom: 38px; left: 54px; right: 54px; height: 2px;background: linear-gradient(90deg, transparent, var(--accent-orange), var(--accent-neon), transparent);background-size: 200% 100%;border-radius: 2px;opacity: 0; pointer-events: none;transition: opacity 0.3s ease;}.glow-loader.active {opacity: 1;animation: loadingMove 1.5s linear infinite;}@keyframes loadingMove { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }.suggest-tags { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }.tag {background: rgba(255, 255, 255, 0.005); border: 1px solid var(--border-neon); color: #807067; padding: 9px 22px; border-radius: 24px; font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); display: flex; align-items: center; gap: 8px;}.tag:hover {background: rgba(255, 69, 0, 0.04); border-color: rgba(255, 115, 0, 0.35); color: #ffffff; transform: translateY(-2px);}VELOCITYNew ChatAsk anything</> Write code💡 Brainstorm ideas🔍 Research a topiclet chats = { 1: [] };let currentChatId = 1;function useTag(text) {const input = document.getElementById('user-input');input.value = text; input.focus();}function resetApp() {chats = { 1: [] }; currentChatId = 1; renderChat(); renderChatList();}function renderChat() {const container = document.getElementById('chat-history');const welcome = document.getElementById('welcome-screen');const tags = document.querySelector('.suggest-tags');if (chats[currentChatId].length === 0) {container.innerHTML = ''; container.appendChild(welcome);welcome.style.display = 'block'; tags.style.display = 'flex';return;}welcome.style.display = 'none'; tags.style.display = 'none';container.innerHTML = '';chats[currentChatId].forEach(msg => {const msgDiv = document.createElement('div');msgDiv.className = message ${msg.sender};if (msg.text.includes('')) { const parts = msg.text.split('');msgDiv.appendChild(document.createTextNode(parts));for (let i = 1; i < parts.length; i += 2) {const containerDiv = document.createElement('div');containerDiv.className = 'code-container';const code = document.createElement('div');code.className = 'code-block';code.innerText = parts[i].replace(/^[a-zA-Z]+\n/, '');const btn = document.createElement('button');btn.className = 'btn-copy'; btn.innerText = 'Copy';btn.onclick = () => {navigator.clipboard.writeText(code.innerText);btn.innerText = 'Copied!'; setTimeout(() => btn.innerText = 'Copy', 1500);};containerDiv.appendChild(btn); containerDiv.appendChild(code);msgDiv.appendChild(containerDiv);if (parts[i+1]) msgDiv.appendChild(document.createTextNode(parts[i+1]));}} else {msgDiv.innerText = msg.text;}container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;}function renderChatList() {const list = document.getElementById('chat-list');list.innerHTML = '';Object.keys(chats).forEach(id => {const item = document.createElement('div');item.className = chat-item ${id == currentChatId ? 'active' : ''};item.innerText = Chat Session #${id};item.onclick = () => { currentChatId = id; renderChat(); renderChatList(); };list.appendChild(item);});}function createNewChat() {const newId = Object.keys(chats).length + 1;chats[newId] = []; currentChatId = newId; renderChat(); renderChatList();}async function sendPayload() {const input = document.getElementById('user-input');let text = input.value.trim();if (!text) return;chats[currentChatId].push({ sender: 'user', text: text });input.value = ''; renderChat();document.getElementById('loader-line').classList.add('active');try {const response = await fetch('openrouter.ai', {method: 'POST',headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + atob('c2skb3OrdjEtNDgyYmRmYTM5MGM3MGQ2MDM1MDNhNzMxOWE3ZmNmNWZlMGIwM2EwOTBiYTRjZjBhY2ZhNzNiMTFkNzkwYmE2NA==')},body: JSON.stringify({model: 'meta-llama/llama-3.2-1b-instruct:free',messages: [{ role: 'user', content: text }]})});const data = await response.json();chats[currentChatId].push({ sender: 'ai', text: data.choices.message.content });} catch (err) {chats[currentChatId].push({ sender: 'ai', text: 'Velocity Node Error. Please try again.' });}document.getElementById('loader-line').classList.remove('active');renderChat();}document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter') sendPayload(); };window.onload = () => { document.getElementById('user-input').focus(); };renderChatList();renderChat();
+        .btn-action { background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; padding: 4px; }
+        .btn-action svg { width: 18px; height: 18px; fill: none; stroke: var(--text-muted); stroke-width: 2.5; transition: all 0.3s ease; }
+        .btn-action:hover svg { stroke: var(--accent-neon); transform: translateX(3px); }
+
+        .glow-loader { position: absolute; bottom: 38px; left: 54px; right: 54px; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-orange), var(--accent-neon), transparent); background-size: 200% 100%; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .glow-loader.active { opacity: 1; animation: loadingMove 1.5s linear infinite; }
+        @keyframes loadingMove { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .suggest-tags { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+        .tag { background: rgba(255, 255, 255, 0.005); border: 1px solid var(--border-neon); color: #807067; padding: 9px 22px; border-radius: 24px; font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); display: flex; align-items: center; gap: 8px; }
+        .tag:hover { background: rgba(255, 69, 0, 0.04); border-color: rgba(255, 115, 0, 0.35); color: #ffffff; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <!-- 3D ПОЛОТНО НА ВСЕ ТЛО САЙТУ -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" xmlns="http://w3.org"><path d="M12,0 L14.5,7.5 L22,10 L14.5,12.5 L12,20 L9.5,12.5 L2,10 L9.5,7.5 Z M13,5 L7,13 H11 L10,18 L16,10 H12 Z"/></svg>
+                VELOCITY
+            </div>
+            <button class="btn-reset" onclick="resetApp()" title="Reset Session">
+                <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </button>
+        </div>
+        
+        <button class="btn-new-chat" onclick="createNewChat()">
+            <span>New Chat</span>
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <div class="chat-list" id="chat-list"></div>
+    </div>
+    
+    <div class="chat-area">
+        <div class="chat-history" id="chat-history">
+            <div class="center-welcome" id="welcome-screen">
+                <svg class="star-symbol" viewBox="0 0 24 24" xmlns="http://w3.org" fill="#ff4500">
+Будьте обачні, використовуючи код.Ask anything</> Write code💡 Brainstorm ideas🔍 Research a topiclet chats = { 1: [] };let currentChatId = 1;// ================= АВТОНОМНИЙ РУШІЙ ГАРАНТОВАНИХ 3D ХВИЛЬ МОРЯ =================try {const scene = new THREE.Scene();const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);camera.position.set(0, 140, 400);const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true });renderer.setSize(window.innerWidth, window.innerHeight);// Будуємо тривимірну сітку води (точно як на Venice.ai)const geometry = new THREE.PlaneGeometry(1400, 1400, 50, 50);geometry.rotateX(-Math.PI / 2);// Топова вогняно-неонова підсвітка ниток моряconst material = new THREE.MeshBasicMaterial({color: 0xff4500,wireframe: true,transparent: true,opacity: 0.12});const mesh = new THREE.Mesh(geometry, material);scene.add(mesh);let mouseX = 0, mouseY = 0;window.addEventListener('mousemove', (e) => {mouseX = (e.clientX - window.innerWidth / 2) * 0.03;mouseY = (e.clientY - window.innerHeight / 2) * 0.03;});window.addEventListener('resize', () => {camera.aspect = window.innerWidth / window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth, window.innerHeight);});let clock = new THREE.Clock();function animate3DSea() {requestAnimationFrame(animate3DSea);const time = clock.getElapsedTime() * 0.8;const position = geometry.attributes.position;// Математична деформація сітки для ефекту хвильfor (let i = 0; i < position.count; i++) {let x = position.getX(i);let z = position.getZ(i);let y = Math.sin(x * 0.008 + time) * 15 + Math.cos(z * 0.008 + time) * 15;position.setY(i, y);}geometry.computeVertexNormals();position.needsUpdate = true;// М'який нахил за мишкоюcamera.position.x += (mouseX - camera.position.x) * 0.05;camera.position.y += (-mouseY + 180 - camera.position.y) * 0.05;camera.lookAt(new THREE.Vector3(0, 0, 0));renderer.render(scene, camera);}animate3DSea();} catch(e) {console.log("3D engine paused by browser security. Using core interface.");}// ================= СИСТЕМНА ЛОГІКА ЧАТУ =================function useTag(text) {const input = document.getElementById('user-input');input.value = text; input.focus();}function resetApp() {chats = { 1: [] }; currentChatId = 1; renderChat(); renderChatList();}function renderChat() {const container = document.getElementById('chat-history');const welcome = document.getElementById('welcome-screen');const tags = document.querySelector('.suggest-tags');if (chats[currentChatId].length === 0) {container.innerHTML = ''; container.appendChild(welcome);welcome.style.display = 'block'; tags.style.display = 'flex';return;}welcome.style.display = 'none'; tags.style.display = 'none';container.innerHTML = '';chats[currentChatId].forEach(msg => {const msgDiv = document.createElement('div');msgDiv.className = message ${msg.sender};if (msg.text.includes('')) { const parts = msg.text.split('');msgDiv.appendChild(document.createTextNode(parts));for (let i = 1; i < parts.length; i += 2) {const containerDiv = document.createElement('div');containerDiv.className = 'code-container';const code = document.createElement('div');code.className = 'code-block';code.innerText = parts[i].replace(/^[a-zA-Z]+\n/, '');const btn = document.createElement('button');btn.className = 'btn-copy'; btn.innerText = 'Copy';btn.onclick = () => {navigator.clipboard.writeText(code.innerText);btn.innerText = 'Copied!'; setTimeout(() => btn.innerText = 'Copy', 1500);};containerDiv.appendChild(btn); containerDiv.appendChild(code);msgDiv.appendChild(containerDiv);if (parts[i+1]) msgDiv.appendChild(document.createTextNode(parts[i+1]));}} else {msgDiv.innerText = msg.text;}container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;}function renderChatList() {const list = document.getElementById('chat-list');list.innerHTML = '';Object.keys(chats).forEach(id => {const item = document.createElement('div');item.className = chat-item ${id == currentChatId ? 'active' : ''};item.innerText = Chat Session #${id};item.onclick = () => { currentChatId = id; renderChat(); renderChatList(); };list.appendChild(item);});}function createNewChat() {const newId = Object.keys(chats).length + 1;chats[newId] = []; currentChatId = newId; renderChat(); renderChatList();}async function sendPayload() {const input = document.getElementById('user-input');let text = input.value.trim();if (!text) return;chats[currentChatId].push({ sender: 'user', text: text });input.value = ''; renderChat();document.getElementById('loader-line').classList.add('active');try {const response = await fetch('openrouter.ai', {method: 'POST',headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + atob('c2skb3OrdjEtNDgyYmRmYTM5MGM3MGQ2MDM1MDNhNzMxOWE3ZmNmNWZlMGIwM2EwOTBiYTRjZjBhY2ZhNzNiMTFkNzkwYmE2NA==')},body: JSON.stringify({model: 'meta-llama/llama-3.2-1b-instruct:free',messages: [{ role: 'user', content: text }]})});const data = await response.json();chats[currentChatId].push({ sender: 'ai', text: data.choices.message.content });} catch (err) {chats[currentChatId].push({ sender: 'ai', text: 'Velocity Node Error. Please try again.' });}document.getElementById('loader-line').classList.remove('active');renderChat();}document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter') sendPayload(); };window.onload = () => { document.getElementById('user-input').focus(); };renderChatList(); renderChat();
