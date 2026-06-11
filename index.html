@@ -3,210 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VELOCITY — Ultimate Omni AI</title>
+    <title>Star AI - Ask Anything Privately</title>
+    <!-- Подключаем иконки FontAwesome и красивый шрифт -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <link href="https://googleapis.com" rel="stylesheet">
     
-    <!-- CONNECTING PREMIUM LUXURY FONTS -->
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Dela+Gothic+One&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --bg-main: #020101;
-            --bg-sidebar: rgba(10, 6, 4, 0.5);
-            --bg-chat-card: rgba(18, 11, 7, 0.35);
-            --border-neon: rgba(255, 85, 0, 0.15);
-            --border-neon-active: rgba(255, 115, 0, 0.45);
-            --accent-orange: #ff4500;
-            --accent-neon: #ff9900;
-            --text-main: #fcf9f7;
-            --text-muted: #7a6960;
-            --sidebar-width: 270px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        /* 100% BULLETPROOF LIQUID FIRE SEA (AUTONOMOUS CSS GRAPHICS) */
-        .sea-background {
+        body, html {
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #e2e8f0;
+            overflow: hidden;
+            background-color: #030712;
+        }
+
+        /* Задний фон: Черное море с эффектом живых волн */
+        .ocean-bg {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background: linear-gradient(135deg, #030201 0%, #160702 30%, #3a1502 65%, #4f1d02 85%, #030201 100%);
-            background-size: 400% 400%;
-            animation: liquidPlasma 12s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(180deg, rgba(10, 25, 47, 0.7) 0%, rgba(3, 7, 18, 0.9) 100%), 
+                        url('https://unsplash.com');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4) contrast(1.2) saturate(0.6);
+            animation: gentleWave 20s ease-in-out infinite alternate;
         }
 
-        @keyframes liquidPlasma {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gentleWave {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05) translateY(-10px); }
         }
 
-        /* КІНЕМАТОГРАФІЧНІ НЕОНОВІ ХВИЛІ ПРИПЛИВУ */
-        .sea-wave-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background: radial-gradient(circle at 50% 60%, rgba(255, 69, 0, 0.08) 0%, transparent 60%),
-                        radial-gradient(circle at 20% 30%, rgba(255, 153, 0, 0.04) 0%, transparent 50%);
-            animation: breathingWater 8s ease-in-out infinite alternate;
+        /* Верхняя панель управления (Шапка) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 10;
         }
 
-        @keyframes breathingWater {
-            0% { opacity: 0.4; transform: scale(1) translateY(-10px); }
-            100% { opacity: 0.9; transform: scale(1.05) translateY(10px); }
-        }
-
-        body { background-color: transparent; color: var(--text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* PREMIUM FROST GLASS SIDEBAR */
-        .sidebar { 
-            width: var(--sidebar-width); 
-            background-color: var(--bg-sidebar); 
-            border-right: 1px solid var(--border-neon); 
-            display: flex; 
-            flex-direction: column; 
-            padding: 35px 24px; 
-            box-sizing: border-box; 
-            backdrop-filter: blur(40px); 
-            -webkit-backdrop-filter: blur(40px); 
-        }
-
-        .logo-container {
+        /* Необычный готический/премиальный шрифт для логотипа как на фото */
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #6366f1, #a5b4fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 22px;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Селектор выбора ИИ-моделей */
+        .model-selector {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            color: #f8fafc;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s;
+        }
+
+        .model-selector:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Главный контейнер */
+        .main-container {
+            display: flex;
+            height: 100%;
+            padding-top: 80px;
+        }
+
+        /* Боковая панель (История чатов) */
+        .sidebar {
+            width: 260px;
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .new-chat-btn {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.2));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(56, 189, 248, 0.4));
+            transform: translateY(-1px);
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #94a3b8;
+            transition: background 0.2s;
+        }
+
+        .chat-item:hover, .chat-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        /* Область экрана чата */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        /* Приветственный экран по центру (как на фото Venice) */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
             margin-bottom: 40px;
         }
 
-        .logo { 
-            font-family: 'Dela Gothic One', cursive; 
-            font-size: 1.2rem; 
-            letter-spacing: 3px; 
-            text-transform: uppercase; 
-            color: #ffffff; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            text-shadow: 0 0 20px rgba(255, 69, 0, 0.65); 
+        /* Премиальная иконка-логотип по центру */
+        .center-icon {
+            font-size: 45px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseGlow 3s ease-in-out infinite;
         }
-        .logo svg { width: 24px; height: 24px; fill: #ff4500; filter: drop-shadow(0 0 5px var(--accent-orange)); }
 
-        .btn-reset {
-            background: transparent; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; transition: all 0.3s ease;
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.3)); }
+            50% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)); }
         }
-        .btn-reset:hover { color: var(--accent-orange); transform: rotate(-90deg); }
-        .btn-reset svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-        .btn-new-chat { 
-            background: rgba(255, 69, 0, 0.02);
-            color: #ffffff; 
-            border: 1px solid var(--border-neon);
-            padding: 14px 20px; 
-            border-radius: 28px; 
-            font-weight: 500; 
-            font-size: 0.88rem;
-            cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+        .welcome-screen h1 {
+            font-size: 42px;
+            font-weight: 500;
+            color: #f8fafc;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Окно с сообщениями диалога */
+        .messages-container {
+            width: 100%;
+            max-width: 800px;
+            flex: 1;
+            overflow-y: auto;
+            display: none; /* Включается, когда идет переписка */
+            flex-direction: column;
+            gap: 20px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: rgba(99, 102, 241, 0.25);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message iframe {
+            border-radius: 12px;
+            margin-top: 10px;
+            border: none;
+        }
+
+        /* Стилизация блока ввода текста */
+        .input-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-container {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            letter-spacing: 0.5px;
-        }
-        .btn-new-chat:hover { 
-            background: rgba(255, 69, 0, 0.06);
-            border-color: var(--border-neon-active);
-            box-shadow: 0 0 25px rgba(255, 69, 0, 0.15);
-            transform: translateY(-1px);
-        }
-        .btn-new-chat svg { width: 14px; height: 14px; fill: none; stroke: var(--accent-neon); stroke-width: 2.5; }
-        
-        .chat-list { flex: 1; margin-top: 35px; overflow-y: auto; }
-        .chat-list::-webkit-scrollbar { width: 0px; }
-        
-        .chat-item { 
-            padding: 14px 18px; 
-            border-radius: 16px; 
-            margin-bottom: 8px; 
-            cursor: pointer; 
-            font-size: 0.86rem; 
-            color: var(--text-muted); 
-            transition: all 0.3s ease;
-            position: relative;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid transparent;
-        }
-        .chat-item:hover { color: #ffffff; background: rgba(255, 255, 255, 0.03); }
-        .chat-item.active { 
-            background: rgba(255, 69, 0, 0.05); 
-            border-color: rgba(255, 69, 0, 0.15);
-            color: #ffffff; 
-            font-weight: 500;
-        }
-        .chat-item.active::before {
-            content: ''; position: absolute; left: 0; top: 30%; width: 3px; height: 40%;
-            background: var(--accent-orange); border-radius: 4px; box-shadow: 0 0 10px var(--accent-orange);
-        }
-        
-        .chat-area { flex: 1; display: flex; flex-direction: column; background-color: transparent; position: relative; }
-        .chat-history { flex: 1; padding: 130px 24px 20px 24px; max-width: 900px; width: 100%; margin: 0 auto; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; gap: 32px; }
-        .chat-history::-webkit-scrollbar { width: 0px; }
-        
-        .center-welcome { text-align: center; margin-top: 12vh; }
-        
-        /* ROTATING QUANTUM STAR SYMBOL */
-        .star-symbol { 
-            width: 65px; height: 65px; margin: 0 auto 24px auto; display: block; 
-            filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.5)); 
-            animation: infiniteRotate 25s linear infinite; 
-        }
-        @keyframes infiniteRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .center-welcome h2 { 
-            font-family: 'Orbitron', sans-serif; font-size: 2.8rem; font-weight: 600; margin-bottom: 45px; color: #ffffff; letter-spacing: -0.5px;
-            background: linear-gradient(180deg, #ffffff 50%, rgba(255,255,255,0.3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            padding: 6px 14px 6px 22px;
+            transition: all 0.3s;
         }
 
-        .message { 
-            max-width: 85%; 
-            line-height: 1.7; 
-            font-size: 1rem; 
-            font-family: 'Inter', sans-serif; 
-            padding: 6px 0; 
-            animation: messageFadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-            opacity: 0;
-            transform: translateY(10px);
+        .input-container:focus-within {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
         }
-        @keyframes messageFadeIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message.user { color: #ffffff; border-left: 2px solid var(--accent-orange); padding-left: 24px; font-weight: 500; align-self: flex-start; }
-        .message.ai { color: #e5d7d0; padding-left: 26px; white-space: pre-wrap; align-self: flex-start; }
-        
-        .code-container { position: relative; margin-top: 16px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-neon); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .code-block { background-color: rgba(6, 4, 3, 0.95); padding: 24px; font-family: 'Share Tech Mono', monospace; overflow-x: auto; white-space: pre-wrap; color: #ffca85; font-size: 0.96rem; letter-spacing: 0.5px; }
-        .btn-copy { position: absolute; top: 12px; right: 12px; background: rgba(15,10,7,0.6); border: 1px solid var(--border-neon); color: var(--text-muted); padding: 6px 14px; font-size: 0.75rem; border-radius: 8px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.2s; }
-        .btn-copy:hover { color: #ffffff; border-color: rgba(255,115,0,0.4); }
 
-        .input-container { padding: 20px 24px 45px 24px; max-width: 900px; width: 100%; margin: 0 auto; box-sizing: border-box; background: linear-gradient(to top, #020101 60%, transparent); position: relative; }
-        
-        /* LUXURY INPUT BOX HUB */
-        .input-area { 
-            background-color: rgba(15, 10, 7, 0.75); 
-            border: 1px solid var(--border-neon); 
-            padding: 14px 28px; 
-            border-radius: 32px; 
-            display: flex; 
-            gap: 18px; 
-            align-items: center; 
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        .input-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 16px;
+            padding: 12px 0;
         }
-        .input-area:focus-within {
-            border-color: var(--border-neon-active);
-            box-shadow: 0 15px 50px rgba(255, 69, 0, 0.15), 0 0 30px rgba(255, 69, 0, 0.05);
+
+        .input-container input::placeholder {
+            color: #64748b;
         }
-        .input-box { flex: 1; background: transparent; border: none; color: #ffffff; padding: 6px 0; outline: none; font-size: 1.02rem; font-family: 'Inter', sans-serif; }
-        .input-box::placeholder { color: #524741; }
-        
-        .btn-action { background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; padding: 4px; }
-Будьте обачні, використовуючи код..btn-action svg { width: 18px; height: 18px; fill: none; stroke: var(--text-muted); stroke-width: 2.5; transition: all 0.3s ease; }.btn-action:hover svg { stroke: var(--accent-neon); transform: translateX(3px); }/* PROGRESS PROGRESS LOADER */.glow-loader {position: absolute;bottom: 38px; left: 54px; right: 54px; height: 2px;background: linear-gradient(90deg, transparent, var(--accent-orange), var(--accent-neon), transparent);background-size: 200% 100%;border-radius: 2px;opacity: 0; pointer-events: none;transition: opacity 0.3s ease;}.glow-loader.active {opacity: 1;animation: loadingMove 1.5s linear infinite;}@keyframes loadingMove { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }.suggest-tags { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }.tag {background: rgba(255, 255, 255, 0.005); border: 1px solid var(--border-neon); color: #807067; padding: 9px 22px; border-radius: 24px; font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); display: flex; align-items: center; gap: 8px;}.tag:hover {background: rgba(255, 69, 0, 0.04); border-color: rgba(255, 115, 0, 0.35); color: #ffffff; transform: translateY(-2px);}VELOCITYNew ChatAsk anything</> Write code💡 Brainstorm ideas🔍 Research a topiclet chats = { 1: [] };let currentChatId = 1;function useTag(text) {const input = document.getElementById('user-input');input.value = text; input.focus();}function resetApp() {chats = { 1: [] }; currentChatId = 1; renderChat(); renderChatList();}function renderChat() {const container = document.getElementById('chat-history');const welcome = document.getElementById('welcome-screen');const tags = document.querySelector('.suggest-tags');if (chats[currentChatId].length === 0) {container.innerHTML = ''; container.appendChild(welcome);welcome.style.display = 'block'; tags.style.display = 'flex';return;}welcome.style.display = 'none'; tags.style.display = 'none';container.innerHTML = '';chats[currentChatId].forEach(msg => {const msgDiv = document.createElement('div');msgDiv.className = message ${msg.sender};if (msg.text.includes('')) { const parts = msg.text.split('');msgDiv.appendChild(document.createTextNode(parts));for (let i = 1; i < parts.length; i += 2) {const containerDiv = document.createElement('div');containerDiv.className = 'code-container';const code = document.createElement('div');code.className = 'code-block';code.innerText = parts[i].replace(/^[a-zA-Z]+\n/, '');const btn = document.createElement('button');btn.className = 'btn-copy'; btn.innerText = 'Copy';btn.onclick = () => {navigator.clipboard.writeText(code.innerText);btn.innerText = 'Copied!'; setTimeout(() => btn.innerText = 'Copy', 1500);};containerDiv.appendChild(btn); containerDiv.appendChild(code);msgDiv.appendChild(containerDiv);if (parts[i+1]) msgDiv.appendChild(document.createTextNode(parts[i+1]));}} else {msgDiv.innerText = msg.text;}container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;}function renderChatList() {const list = document.getElementById('chat-list');list.innerHTML = '';Object.keys(chats).forEach(id => {const item = document.createElement('div');item.className = chat-item ${id == currentChatId ? 'active' : ''};item.innerText = Chat Session #${id};item.onclick = () => { currentChatId = id; renderChat(); renderChatList(); };list.appendChild(item);});}function createNewChat() {const newId = Object.keys(chats).length + 1;chats[newId] = []; currentChatId = newId; renderChat(); renderChatList();}async function sendPayload() {const input = document.getElementById('user-input');let text = input.value.trim();if (!text) return;chats[currentChatId].push({ sender: 'user', text: text });input.value = ''; renderChat();document.getElementById('loader-line').classList.add('active');try {const response = await fetch('openrouter.ai', {method: 'POST',headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + atob('c2skb3OrdjEtNDgyYmRmYTM5MGM3MGQ2MDM1MDNhNzMxOWE3ZmNmNWZlMGIwM2EwOTBiYTRjZjBhY2ZhNzNiMTFkNzkwYmE2NA==')},body: JSON.stringify({model: 'meta-llama/llama-3.2-1b-instruct:free',messages: [{ role: 'user', content: text }]})});const data = await response.json();chats[currentChatId].push({ sender: 'ai', text: data.choices[0].message.content });} catch (err) {chats[currentChatId].push({ sender: 'ai', text: 'Velocity Node Error. Please try again.' });}document.getElementById('loader-line').classList.remove('active');renderChat();}document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter') sendPayload(); };window.onload = () => { document.getElementById('user-input').focus(); };renderChatList(); renderChat();
+
+        /* Кнопки прикрепления файла и отправки */
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 18px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .send-btn {
+            background: #fff;
+            color: #000;
+        }
+
+        .send-btn:hover {
+            background: #e2e8f0;
+            color: #000;
+        }
+
+        /* Быстрые функциональные кнопки (теги снизу поисковой строки) */
+        .quick-tags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag-btn {
+            background: rgba(255, 255, 255, 0.04);
+Будьте обачні, використовуючи код.border: 1px solid rgba(255, 255, 255, 0.05);color: #94a3b8;padding: 8px 16px;border-radius: 20px;cursor: pointer;font-size: 13px;font-weight: 500;display: flex;align-items: center;gap: 6px;transition: all 0.2s;}.tag-btn:hover {background: rgba(255, 255, 255, 0.08);border-color: rgba(255, 255, 255, 0.1);color: #fff;transform: translateY(-1px);}/* Статус загруженного файла */.file-status {font-size: 12px;color: #38bdf8;padding-left: 20px;display: none;}/* Скроллбары */::-webkit-scrollbar {width: 6px;}::-webkit-scrollbar-thumb {background: rgba(255, 255, 255, 0.1);border-radius: 10px;}STARGemini 1.5 Flash (Uncensored)OpenAI GPT-4o Flash (No-Logs)Star Vision & Photo Gen New ChatWelcome to Star AI✦Ask anything Write content Brainstorm ideas Write code Photo Gen// Хранилище диалоговlet conversations = [{ id: 0, title: "Welcome to Star AI", messages: [] }];let currentChatId = 0;// Автоопределение языка вводаfunction detectLanguageAndRespond(text, model) {const russianPattern = /[а-яёА-ЯЁ]/;const isRussian = russianPattern.test(text);// Имитация ответов ИИ без цензуры (Симуляция API Gemini/OpenAI)if (text.toLowerCase().includes('video') || text.toLowerCase().includes('видео')) {return isRussian? Вот лучшее видео по вашему запросу на YouTube: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>: Here is the best video matching your request on YouTube: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>;}if (text.toLowerCase().includes('photo') || text.toLowerCase().includes('фото') || model === 'star-vision') {return isRussian? Генерация фото успешно завершена! Вот ваше изображение черного моря: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>: Photo generation complete! Here is your image of the black sea: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>;}// Стандартные ответы на основе языка ввода пользователяif (isRussian) {return Привет! Я твой приватный ИИ ассистент <b>Star</b>, запущенный через модель <b>${model}</b> без логов и цензуры. Напиши мне любой запрос, и я помогу без ограничений.;} else {return Hello! I am your private AI assistant <b>Star</b>, running on <b>${model}</b> with complete privacy and zero censorship. Drop any query, and I'll assist you without boundaries.;}}function sendMessage() {const input = document.getElementById('userInput');const text = input.value.trim();const model = document.getElementById('modelSelect').value;if (!text) return;// Переключение интерфейса из начального режима в режим чатаdocument.getElementById('welcomeScreen').style.display = 'none';document.getElementById('quickTags').style.display = 'none';const container = document.getElementById('messagesContainer');container.style.display = 'flex';// Добавляем сообщение пользователяappendMessage(text, 'user');input.value = '';// Очищаем статус файла, если он былdocument.getElementById('fileStatus').style.display = 'none';// Эффект задержки печати от ИИsetTimeout(() => {const aiResponse = detectLanguageAndRespond(text, model);appendMessage(aiResponse, 'ai');}, 600);}function appendMessage(text, sender) {const container = document.getElementById('messagesContainer');const msgDiv = document.createElement('div');msgDiv.classList.add('message', sender);msgDiv.innerHTML = text;container.appendChild(msgDiv);container.scrollTop = container.scrollHeight;// Сохраняем в историю текущего чатаconversations[currentChatId].messages.push({ text, sender });}// Загрузка быстрых кнопок в поле вводаfunction usePreset(text) {document.getElementById('userInput').value = text;sendMessage();}// Обработка загрузки файлов до 25 МБfunction handleFileUpload(event) {const file = event.target.files[0];if (!file) return;const maxSize = 25 * 1024 * 1024; // 25 MBconst statusDiv = document.getElementById('fileStatus');if (file.size > maxSize) {statusDiv.style.color = '#ef4444';statusDiv.innerText = Error: File exceeds 25MB limit. (${(file.size/1024/1024).toFixed(1)}MB);statusDiv.style.display = 'block';event.target.value = ''; // сброс файла} else {statusDiv.style.color = '#38bdf8';statusDiv.innerText = 📎 Uploaded: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB);statusDiv.style.display = 'block';}}// Кнопка очистки / Возврат к начальному экрану (New Chat)function resetToHome() {document.getElementById('messagesContainer').style.display = 'none';document.getElementById('messagesContainer').innerHTML = '';document.getElementById('welcomeScreen').style.display = 'flex';document.getElementById('quickTags').style.display = 'flex';document.getElementById('fileStatus').style.display = 'none';// Логика добавления вкладки в историюconst newId = conversations.length;const newChat = { id: newId, title: Chat #${newId + 1}, messages: [] };conversations.push(newChat);currentChatId = newId;const list = document.getElementById('chatList');const items = list.querySelectorAll('.chat-item');items.forEach(i => i.classList.remove('active'));const newItem = document.createElement('div');newItem.classList.add('chat-item', 'active');newItem.innerText = newChat.title;newItem.onclick = () => loadChat(newId, newItem);list.appendChild(newItem);}function loadChat(id, element) {currentChatId = id;if(element) {const list = document.getElementById('chatList');list.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));element.classList.add('active');}const container = document.getElementById('messagesContainer');container.innerHTML = '';const chat = conversations[id];if (chat.messages.length === 0) {document.getElementById('welcomeScreen').style.display = 'flex';document.getElementById('quickTags').style.display = 'flex';container.style.display = 'none';} else {document.getElementById('welcomeScreen').style.display = 'none';document.getElementById('quickTags').style.display = 'none';container.style.display = 'flex';chat.messages.forEach(msg => {const msgDiv = document.createElement('div');msgDiv.classList.add('message', msg.sender);msgDiv.innerHTML = msg.text;container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;}}
