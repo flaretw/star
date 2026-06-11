@@ -3,335 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star AI - Ask Anything Privately</title>
-    <!-- Подключаем иконки FontAwesome и красивый шрифт -->
+    <title>Star AI</title>
     <link rel="stylesheet" href="https://cloudflare.com">
     <link href="https://googleapis.com" rel="stylesheet">
-    
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body, html {
-            height: 100%;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #e2e8f0;
-            overflow: hidden;
-            background-color: #030712;
-        }
-
-        /* Задний фон: Черное море с эффектом живых волн */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { height: 100%; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0; overflow: hidden; background-color: #030712; }
         .ocean-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(180deg, rgba(10, 25, 47, 0.7) 0%, rgba(3, 7, 18, 0.9) 100%), 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(180deg, rgba(10, 25, 47, 0.75) 0%, rgba(3, 7, 18, 0.95) 100%), 
                         url('https://unsplash.com');
-            background-size: cover;
-            background-position: center;
-            filter: brightness(0.4) contrast(1.2) saturate(0.6);
-            animation: gentleWave 20s ease-in-out infinite alternate;
+            background-size: cover; background-position: center; filter: brightness(0.5);
         }
-
-        @keyframes gentleWave {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05) translateY(-10px); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; position: absolute; top: 0; width: 100%; z-index: 10; }
+        .logo { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; letter-spacing: 3px; background: linear-gradient(135deg, #6366f1, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        .model-selector { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(99, 102, 241, 0.3); padding: 8px 16px; border-radius: 12px; color: #f8fafc; font-size: 14px; outline: none; cursor: pointer; backdrop-filter: blur(12px); }
+        .main-container { display: flex; height: 100%; padding-top: 80px; }
+        .sidebar { width: 260px; background: rgba(3, 7, 18, 0.6); backdrop-filter: blur(20px); border-right: 1px solid rgba(255, 255, 255, 0.05); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .new-chat-btn { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.2)); border: 1px solid rgba(99, 102, 241, 0.3); color: #fff; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 500; }
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item { padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #94a3b8; }
+        .chat-item.active { background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 30px 40px; }
+        .welcome-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+        .center-icon { font-size: 45px; margin-bottom: 20px; background: linear-gradient(135deg, #a5b4fc, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .welcome-screen h1 { font-size: 42px; font-weight: 500; color: #f8fafc; margin-bottom: 30px; }
+        .messages-container { width: 100%; max-width: 800px; flex: 1; overflow-y: auto; display: none; flex-direction: column; gap: 20px; }
+        .message { max-width: 85%; padding: 14px 18px; border-radius: 16px; font-size: 15px; line-height: 1.5; }
+        .message.user { align-self: flex-end; background: rgba(99, 102, 241, 0.3); color: #fff; }
+        .message.ai { align-self: flex-start; background: rgba(15, 23, 42, 0.6); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .input-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 12px; }
+        .input-container { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; display: flex; align-items: center; padding: 6px 14px; }
+        .input-container input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 16px; padding: 12px; }
+        .action-btn { background: transparent; border: none; color: #64748b; font-size: 18px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .send-btn { background: #fff; color: #000; }
+        .quick-tags { display: flex; justify-content: center; gap: 10px; }
+        .tag-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.05); color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; }
+        .file-status { font-size: 12px; color: #38bdf8; display: none; padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <div class="ocean-bg"></div>
+    <header>
+        <div class="logo" onclick="resetToHome()">✦ STAR</div>
+        <select class="model-selector" id="modelSelect">
+            <option value="gemini-flash">Gemini 1.5 Flash (Uncensored)</option>
+            <option value="openai-flash">OpenAI GPT-4o Flash (No-Logs)</option>
+            <option value="star-vision">Star Vision & Photo Gen</option>
+        </select>
+    </header>
+    <div class="main-container">
+        <aside class="sidebar">
+            <button class="new-chat-btn" onclick="resetToHome()"><i class="fa-solid fa-plus"></i> New Chat</button>
+            <div class="chat-list" id="chatList"><div class="chat-item active">Welcome to Star AI</div></div>
+        </aside>
+        <main class="chat-area">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="center-icon">✦</div>
+                <h1>Ask anything</h1>
+            </div>
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="input-wrapper">
+                <div class="file-status" id="fileStatus"></div>
+                <div class="input-container">
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)">
+                    <button class="action-btn" onclick="document.getElementById('fileInput').click()"><i class="fa-solid fa-paperclip"></i></button>
+                    <input type="text" id="userInput" placeholder="Ask anything privately..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="action-btn send-btn" onclick="sendMessage()"><i class="fa-solid fa-arrow-up"></i></button>
+                </div>
+                <div class="quick-tags" id="quickTags">
+                    <button class="tag-btn" onclick="usePreset('Write content about Star AI')">Write content</button>
+                    <button class="tag-btn" onclick="usePreset('Brainstorm creative names')">Brainstorm ideas</button>
+                    <button class="tag-btn" onclick="usePreset('Write clean Python code')">Write code</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        let conversations = [{ id: 0, title: "Welcome to Star AI", messages: [] }];
+        let currentChatId = 0;
+        function detectLanguageAndRespond(text, model) {
+            const isRussian = /[а-яёА-ЯЁ]/.test(text);
+            if (text.toLowerCase().includes('video') || text.toLowerCase().includes('видео')) {
+                return isRussian ? `Вот видео по запросу: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>` : `Here is your video: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>`;
+            }
+            if (text.toLowerCase().includes('photo') || text.toLowerCase().includes('фото') || model === 'star-vision') {
+                return isRussian ? `Фото сгенерировано: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>` : `Photo generated: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>`;
+            }
+            return isRussian ? `Привет! Я твой приватный ИИ <b>Star</b> (${model}). Задавай любой вопрос без цензуры!` : `Hello! I am your private <b>Star</b> AI (${model}). Ask me anything uncensored!`;
         }
-
-        /* Верхняя панель управления (Шапка) */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 10;
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            const model = document.getElementById('modelSelect').value;
+            if (!text) return;
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('quickTags').style.display = 'none';
+            const container = document.getElementById('messagesContainer');
+            container.style.display = 'flex';
+            appendMessage(text, 'user');
+            input.value = '';
+            document.getElementById('fileStatus').style.display = 'none';
+            setTimeout(() => { appendMessage(detectLanguageAndRespond(text, model), 'ai'); }, 400);
         }
-
-        /* Необычный готический/премиальный шрифт для логотипа как на фото */
-        .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #6366f1, #a5b4fc, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+        function appendMessage(text, sender) {
+            const container = document.getElementById('messagesContainer');
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender);
+            msgDiv.innerHTML = text;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+            conversations[currentChatId].messages.push({ text, sender });
         }
-
-        .logo i {
-            font-size: 22px;
-            background: linear-gradient(135deg, #6366f1, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Селектор выбора ИИ-моделей */
-        .model-selector {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 8px 16px;
-            border-radius: 12px;
-            color: #f8fafc;
-            font-size: 14px;
-            font-weight: 500;
-            outline: none;
-            cursor: pointer;
-            backdrop-filter: blur(12px);
-            transition: all 0.3s;
-        }
-
-        .model-selector:hover {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-        }
-
-        /* Главный контейнер */
-        .main-container {
-            display: flex;
-            height: 100%;
-            padding-top: 80px;
-        }
-
-        /* Боковая панель (История чатов) */
-        .sidebar {
-            width: 260px;
-            background: rgba(3, 7, 18, 0.4);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 5;
-        }
-
-        .new-chat-btn {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.2));
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #fff;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-
-        .new-chat-btn:hover {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(56, 189, 248, 0.4));
-            transform: translateY(-1px);
-        }
-
-        .chat-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .chat-item {
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #94a3b8;
-            transition: background 0.2s;
-        }
-
-        .chat-item:hover, .chat-item.active {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-        }
-
-        /* Область экрана чата */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 30px 40px;
-            position: relative;
-        }
-
-        /* Приветственный экран по центру (как на фото Venice) */
-        .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        /* Премиальная иконка-логотип по центру */
-        .center-icon {
-            font-size: 45px;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #a5b4fc, #6366f1, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.3)); }
-            50% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)); }
-        }
-
-        .welcome-screen h1 {
-            font-size: 42px;
-            font-weight: 500;
-            color: #f8fafc;
-            margin-bottom: 30px;
-            letter-spacing: -0.5px;
-        }
-
-        /* Окно с сообщениями диалога */
-        .messages-container {
-            width: 100%;
-            max-width: 800px;
-            flex: 1;
-            overflow-y: auto;
-            display: none; /* Включается, когда идет переписка */
-            flex-direction: column;
-            gap: 20px;
-            padding-right: 10px;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-width: 85%;
-            padding: 14px 18px;
-            border-radius: 16px;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: rgba(99, 102, 241, 0.25);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.ai {
-            align-self: flex-start;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #e2e8f0;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message iframe {
-            border-radius: 12px;
-            margin-top: 10px;
-            border: none;
-        }
-
-        /* Стилизация блока ввода текста */
-        .input-wrapper {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .input-container {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            padding: 6px 14px 6px 22px;
-            transition: all 0.3s;
-        }
-
-        .input-container:focus-within {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-        }
-
-        .input-container input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-size: 16px;
-            padding: 12px 0;
-        }
-
-        .input-container input::placeholder {
-            color: #64748b;
-        }
-
-        /* Кнопки прикрепления файла и отправки */
-        .action-btn {
-            background: transparent;
-            border: none;
-            color: #64748b;
-            font-size: 18px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .send-btn {
-            background: #fff;
-            color: #000;
-        }
-
-        .send-btn:hover {
-            background: #e2e8f0;
-            color: #000;
-        }
-
-        /* Быстрые функциональные кнопки (теги снизу поисковой строки) */
-        .quick-tags {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tag-btn {
-            background: rgba(255, 255, 255, 0.04);
-Будьте обачні, використовуючи код.border: 1px solid rgba(255, 255, 255, 0.05);color: #94a3b8;padding: 8px 16px;border-radius: 20px;cursor: pointer;font-size: 13px;font-weight: 500;display: flex;align-items: center;gap: 6px;transition: all 0.2s;}.tag-btn:hover {background: rgba(255, 255, 255, 0.08);border-color: rgba(255, 255, 255, 0.1);color: #fff;transform: translateY(-1px);}/* Статус загруженного файла */.file-status {font-size: 12px;color: #38bdf8;padding-left: 20px;display: none;}/* Скроллбары */::-webkit-scrollbar {width: 6px;}::-webkit-scrollbar-thumb {background: rgba(255, 255, 255, 0.1);border-radius: 10px;}STARGemini 1.5 Flash (Uncensored)OpenAI GPT-4o Flash (No-Logs)Star Vision & Photo Gen New ChatWelcome to Star AI✦Ask anything Write content Brainstorm ideas Write code Photo Gen// Хранилище диалоговlet conversations = [{ id: 0, title: "Welcome to Star AI", messages: [] }];let currentChatId = 0;// Автоопределение языка вводаfunction detectLanguageAndRespond(text, model) {const russianPattern = /[а-яёА-ЯЁ]/;const isRussian = russianPattern.test(text);// Имитация ответов ИИ без цензуры (Симуляция API Gemini/OpenAI)if (text.toLowerCase().includes('video') || text.toLowerCase().includes('видео')) {return isRussian? Вот лучшее видео по вашему запросу на YouTube: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>: Here is the best video matching your request on YouTube: <br><iframe width="100%" height="315" src="https://youtube.com" allowfullscreen></iframe>;}if (text.toLowerCase().includes('photo') || text.toLowerCase().includes('фото') || model === 'star-vision') {return isRussian? Генерация фото успешно завершена! Вот ваше изображение черного моря: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>: Photo generation complete! Here is your image of the black sea: <br><img src="https://unsplash.com" style="width:100%; border-radius:12px; margin-top:10px;"/>;}// Стандартные ответы на основе языка ввода пользователяif (isRussian) {return Привет! Я твой приватный ИИ ассистент <b>Star</b>, запущенный через модель <b>${model}</b> без логов и цензуры. Напиши мне любой запрос, и я помогу без ограничений.;} else {return Hello! I am your private AI assistant <b>Star</b>, running on <b>${model}</b> with complete privacy and zero censorship. Drop any query, and I'll assist you without boundaries.;}}function sendMessage() {const input = document.getElementById('userInput');const text = input.value.trim();const model = document.getElementById('modelSelect').value;if (!text) return;// Переключение интерфейса из начального режима в режим чатаdocument.getElementById('welcomeScreen').style.display = 'none';document.getElementById('quickTags').style.display = 'none';const container = document.getElementById('messagesContainer');container.style.display = 'flex';// Добавляем сообщение пользователяappendMessage(text, 'user');input.value = '';// Очищаем статус файла, если он былdocument.getElementById('fileStatus').style.display = 'none';// Эффект задержки печати от ИИsetTimeout(() => {const aiResponse = detectLanguageAndRespond(text, model);appendMessage(aiResponse, 'ai');}, 600);}function appendMessage(text, sender) {const container = document.getElementById('messagesContainer');const msgDiv = document.createElement('div');msgDiv.classList.add('message', sender);msgDiv.innerHTML = text;container.appendChild(msgDiv);container.scrollTop = container.scrollHeight;// Сохраняем в историю текущего чатаconversations[currentChatId].messages.push({ text, sender });}// Загрузка быстрых кнопок в поле вводаfunction usePreset(text) {document.getElementById('userInput').value = text;sendMessage();}// Обработка загрузки файлов до 25 МБfunction handleFileUpload(event) {const file = event.target.files[0];if (!file) return;const maxSize = 25 * 1024 * 1024; // 25 MBconst statusDiv = document.getElementById('fileStatus');if (file.size > maxSize) {statusDiv.style.color = '#ef4444';statusDiv.innerText = Error: File exceeds 25MB limit. (${(file.size/1024/1024).toFixed(1)}MB);statusDiv.style.display = 'block';event.target.value = ''; // сброс файла} else {statusDiv.style.color = '#38bdf8';statusDiv.innerText = 📎 Uploaded: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB);statusDiv.style.display = 'block';}}// Кнопка очистки / Возврат к начальному экрану (New Chat)function resetToHome() {document.getElementById('messagesContainer').style.display = 'none';document.getElementById('messagesContainer').innerHTML = '';document.getElementById('welcomeScreen').style.display = 'flex';document.getElementById('quickTags').style.display = 'flex';document.getElementById('fileStatus').style.display = 'none';// Логика добавления вкладки в историюconst newId = conversations.length;const newChat = { id: newId, title: Chat #${newId + 1}, messages: [] };conversations.push(newChat);currentChatId = newId;const list = document.getElementById('chatList');const items = list.querySelectorAll('.chat-item');items.forEach(i => i.classList.remove('active'));const newItem = document.createElement('div');newItem.classList.add('chat-item', 'active');newItem.innerText = newChat.title;newItem.onclick = () => loadChat(newId, newItem);list.appendChild(newItem);}function loadChat(id, element) {currentChatId = id;if(element) {const list = document.getElementById('chatList');list.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));element.classList.add('active');}const container = document.getElementById('messagesContainer');container.innerHTML = '';const chat = conversations[id];if (chat.messages.length === 0) {document.getElementById('welcomeScreen').style.display = 'flex';document.getElementById('quickTags').style.display = 'flex';container.style.display = 'none';} else {document.getElementById('welcomeScreen').style.display = 'none';document.getElementById('quickTags').style.display = 'none';container.style.display = 'flex';chat.messages.forEach(msg => {const msgDiv = document.createElement('div');msgDiv.classList.add('message', msg.sender);msgDiv.innerHTML = msg.text;container.appendChild(msgDiv);});container.scrollTop = container.scrollHeight;}}
+        function usePreset(text) { document.getElementById('userInput').value = text; sendMessage(); }
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const statusDiv = document.getElementById('fileStatus');
+            if (file.size > 25 * 1024 * 1024) {
+                statusDiv.style.color = '#ef4444'; statusDiv.innerText = `Error: Exceeds 25MB`;
+            } else {
+Будьте обачні, використовуючи код.statusDiv.style.color = '#38bdf8'; statusDiv.innerText = 📎 Attached: ${file.name};}statusDiv.style.display = 'block';}function resetToHome() {document.getElementById('messagesContainer').innerHTML = '';document.getElementById('welcomeScreen').style.display = 'flex';document.getElementById('quickTags').style.display = 'flex';document.getElementById('messagesContainer').style.display = 'none';}
